@@ -1,0 +1,2 @@
+# ntt
+Automating boring stuffs
