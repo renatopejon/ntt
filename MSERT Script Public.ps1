@@ -85,7 +85,7 @@ else {
     Write-Output "Lets lower the CPU priority so we are not too abusive."
     Get-Process msert | ForEach-Object { 
         $_.PriorityClass='BelowNormal'
-        $_.ProcessorAffinity = 1
+        $_.ProcessorAffinity = 7
     }
 
     Write-Output "Looks like msert is running, lets cat c:\windows\debug\msert.log to confirm."
