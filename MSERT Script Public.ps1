@@ -135,8 +135,6 @@ while ($running -eq 1) {
         
         $URLSP = "https://nttlimited.sharepoint.com/teams/am.brazil-public/"
 
-        #Add-PnPStoredCredential -Name $URLSP -Username $Creds.UserName -Password $Creds.Password
-
         import-Module PnP.PowerShell 
         Connect-PnPOnline -Url $URLSP -UseWebLogin
 
@@ -145,6 +143,10 @@ while ($running -eq 1) {
         $ctx.ExecuteQuery()
         $email = $ctx.Web.CurrentUser.Email
         $user = $email -replace '@.*$', ''
+
+        if (Test-Path "C:\Windows\Debug\$user-$env:COMPUTERNAME-msert.log") {
+            Remove-Item "C:\Windows\Debug\$user-$env:COMPUTERNAME-msert.log" -Confirm:$false -Recurse -Force
+        }
 
         try {
             Rename-Item -Path "C:\Windows\debug\msert.log" -NewName "$user-$env:COMPUTERNAME-msert.log"
