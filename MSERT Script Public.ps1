@@ -26,6 +26,27 @@ function Write-TerminalProgress {
     }
 }
 
+# Log function
+function Write-Log {
+    [CmdletBinding()]
+    param(
+        [Parameter()]
+        [ValidateNotNullOrEmpty()]
+        [string]$Message,
+ 
+        [Parameter()]
+        [ValidateNotNullOrEmpty()]
+        [ValidateSet('Information','Warning','Error')]
+        [string]$Severity = 'Information'
+    )
+ 
+    [pscustomobject]@{
+        Time = (Get-Date -f g)
+        Message = $Message
+        Severity = $Severity
+    } | Export-Csv -Path "C:\Windows\debug\ScriptLog.csv" -Append -NoTypeInformation
+ }
+
 # Install PowerShell SharePoint Module
 If(-not(Get-InstalledModule PnP.PowerShell -ErrorAction silentlycontinue)){
     Install-Module PnP.PowerShell -Confirm:$False -Force
@@ -46,9 +67,11 @@ if (Test-Path $EXEPath) {
         Write-output "Attempting to delete $EXEPath"
         Remove-Item $EXEPath -Force -ErrorAction Stop
         Write-Output "Old MSERT deleted succesfuly"
+        Write-Log -Message "Old MSERT deleted succesfuly" -Severity Information
     }
     catch {
         Write-Output "ERROR: Unable to delete $EXEPath, script terminating with error $($_.Exception.Message)"
+        Write-Log -Message "ERROR: Unable to delete $EXEPath, script terminating with error $($_.Exception.Message)" -Severity Error
         throw
     }
 }
@@ -58,16 +81,25 @@ else {
 
 # Download lastest 64bit version of MSERT
 Write-output "Downloading the MSERT 64bit..."
-Invoke-WebRequest -Uri $URL -outfile $EXEPath    
+try {
+    Invoke-WebRequest -Uri $URL -outfile $EXEPath  
+}
+catch {
+    Write-Log -Message "MSERT download Error: $($_.Exception.Message)" -Severity Error
+}
+
+  
 
 # Delete old msert.log if exists
 if (Test-Path 'C:\Windows\Debug\msert.log') {
     try {
         Write-output "Attempting to delete old C:\Windows\Debug\msert.log"
         Remove-Item 'C:\Windows\Debug\msert.log' -Force -ErrorAction Stop
+        Write-Log -Message "Old msert.log deleted." -Severity Information
     }
     catch {
         Write-Output "ERROR: Unable to delete the msert.log file, scripting terminating with error $($_.Exception.Message)"
+        Write-Log -Message "ERROR: Unable to delete the msert.log file, scripting terminating with error $($_.Exception.Message)" -Severity Error
         throw
     }
 }
@@ -92,6 +124,7 @@ else {
     Write-Output "Giving MSERT 5 seconds to start before catting the file."
     Start-Sleep -Seconds 5
     Get-Content -Path "c:\windows\debug\msert.log" -Raw
+    Write-Log -Message "MSERT Scan has started!" -Severity Information
 }
 
 # Wait MSERT finishes to send the log and upload it to SharePoint
@@ -113,11 +146,19 @@ while ($running -eq 1) {
         $email = $ctx.Web.CurrentUser.Email
         $user = $email -replace '@.*$', ''
 
-        Rename-Item -Path "C:\Windows\debug\msert.log" -NewName "$user-$env:COMPUTERNAME-msert.log"
-        $Files = Get-ChildItem "C:\Windows\debug\$user-$env:COMPUTERNAME-msert.log"
-        foreach($File in $Files){
-            Add-PnPFile -Folder "Shared Documents/General/I&T/Logs" -Path $File.FullName
+        try {
+            Rename-Item -Path "C:\Windows\debug\msert.log" -NewName "$user-$env:COMPUTERNAME-msert.log"
+            $Files = Get-ChildItem "C:\Windows\debug\$user-$env:COMPUTERNAME-msert.log"
+            foreach($File in $Files){
+                Add-PnPFile -Folder "Shared Documents/General/I&T/Logs" -Path $File.FullName
+            }
+            Write-Log -Message "MSERT log sent to the right folder." -Severity Information
         }
+        catch {
+            Write-Log -Message "ERROR: Unable to send logs to Sharepoint. Error: $($_.Exception.Message)" -Severity Error
+        }
+
+        
     }
     else { 
         Clear-Host
@@ -126,7 +167,14 @@ while ($running -eq 1) {
     }   
 }
 
-Remove-Item C:\msert.exe -Confirm:$false -Recurse -Force
-Remove-Item C:\spinners.json -Confirm:$false -Recurse -Force
+try {
+    Remove-Item C:\msert.exe -Confirm:$false -Recurse -Force
+    Remove-Item C:\spinners.json -Confirm:$false -Recurse -Force
+    Write-Log -Message "Script files deleted and finished the script" -Severity Information
+}
+catch {
+    Write-Log -Message "ERROR: Unable to delete the script files. Error: $($_.Exception.Message)" -Severity Error
+}
+
 
 exit 
