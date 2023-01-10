@@ -1,4 +1,5 @@
 $URL = "http://definitionupdates.microsoft.com/download/definitionupdates/safetyscanner/amd64/MSERT.exe"
+$URLSP = "https://nttlimited.sharepoint.com/teams/am.brazil-public/"
 $EXEPath = "C:\msert.exe"
 $JSON = 'https://raw.githubusercontent.com/sindresorhus/cli-spinners/main/spinners.json'
 #$Creds = get-credential
@@ -132,8 +133,6 @@ $running = 1
 while ($running -eq 1) {
     if ($Null -eq (get-process "msert" -ea SilentlyContinue)){
         $running = 0 
-        
-        $URLSP = "https://nttlimited.sharepoint.com/teams/am.brazil-public/"
 
         import-Module PnP.PowerShell 
         Connect-PnPOnline -Url $URLSP -UseWebLogin
@@ -154,10 +153,10 @@ while ($running -eq 1) {
             foreach($File in $Files){
                 Add-PnPFile -Folder "Shared Documents/General/I&T/Logs" -Path $File.FullName
             }
-            Write-Log -Message "MSERT log sent to the right folder." -Severity Information
+            Write-Log -Message "MSERT log sent to the /Logs folder." -Severity Information
         }
         catch {
-            Write-Log -Message "ERROR: Unable to send logs to Sharepoint. Error: $($_.Exception.Message)" -Severity Error
+            Write-Log -Message "ERROR: Unable to send MSERT log to Sharepoint. Error: $($_.Exception.Message)" -Severity Error
         }
 
         
@@ -178,5 +177,17 @@ catch {
     Write-Log -Message "ERROR: Unable to delete the script files. Error: $($_.Exception.Message)" -Severity Error
 }
 
+# Send Script log to Sharepoint
+try {
+    Rename-Item -Path "C:\Windows\debug\ScriptLog.csv" -NewName "$user-$env:COMPUTERNAME-ScriptLog.csv"
+    $Files = Get-ChildItem "C:\Windows\debug\$user-$env:COMPUTERNAME-ScriptLog.csv"
+    foreach($File in $Files){
+        Add-PnPFile -Folder "Shared Documents/General/I&T/Logs/ScriptLogs" -Path $File.FullName
+    }
+    Write-Log -Message "Script log sent to the /ScriptLogs folder." -Severity Information
+}
+catch {
+    Write-Log -Message "ERROR: Unable to send Script log to Sharepoint. Error: $($_.Exception.Message)" -Severity Error
+}
 
 exit 
