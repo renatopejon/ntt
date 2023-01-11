@@ -2,7 +2,6 @@ $URL = "http://definitionupdates.microsoft.com/download/definitionupdates/safety
 $URLSP = "https://nttlimited.sharepoint.com/teams/am.brazil-public/"
 $EXEPath = "C:\msert.exe"
 $JSON = 'https://raw.githubusercontent.com/sindresorhus/cli-spinners/main/spinners.json'
-#$Creds = get-credential
 
 # Loading animation function
 (Invoke-WebRequest -Uri $JSON -UseBasicParsing).Content  | 
@@ -52,6 +51,17 @@ function Write-Log {
 If(-not(Get-InstalledModule PnP.PowerShell -ErrorAction silentlycontinue)){
     Install-Module PnP.PowerShell -Confirm:$False -Force
 }
+
+# Import and connect PnP
+try {
+    import-Module PnP.PowerShell 
+    Connect-PnPOnline -Url $URLSP -Interactive
+    Write-Log -Message "PnP connected." -Severity Information
+}
+catch {
+    Write-Log -Message "Can't connect PnP. Error: $($_.Exception.Message)" -Severity Error
+}
+
 
 # Check if MSERT is running
 if ($Null -eq (get-process "msert" -ea SilentlyContinue)){ 
@@ -133,9 +143,7 @@ $running = 1
 while ($running -eq 1) {
     if ($Null -eq (get-process "msert" -ea SilentlyContinue)){
         $running = 0 
-
-        import-Module PnP.PowerShell 
-        Connect-PnPOnline -Url $URLSP -UseWebLogin
+        Write-Log -Message "MSERT Scan finished." -Severity Information
 
         $ctx = Get-PnPContext
         $ctx.Load($ctx.Web.CurrentUser)
