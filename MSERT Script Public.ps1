@@ -187,6 +187,10 @@ catch {
 
 # Send Script log to Sharepoint
 try {
+    if (Test-Path "C:\Windows\Debug\$user-$env:COMPUTERNAME-ScriptLog.csv") {
+        Remove-Item "C:\Windows\Debug\$user-$env:COMPUTERNAME-ScriptLog.csv" -Confirm:$false -Recurse -Force
+    }
+    
     Rename-Item -Path "C:\Windows\debug\ScriptLog.csv" -NewName "$user-$env:COMPUTERNAME-ScriptLog.csv"
     $Files = Get-ChildItem "C:\Windows\debug\$user-$env:COMPUTERNAME-ScriptLog.csv"
     foreach($File in $Files){
