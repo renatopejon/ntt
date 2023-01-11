@@ -55,7 +55,7 @@ If(-not(Get-InstalledModule PnP.PowerShell -ErrorAction silentlycontinue)){
 # Import and connect PnP
 try {
     import-Module PnP.PowerShell 
-    Connect-PnPOnline -Url $URLSP -Interactive -ForceAuthentication
+    Connect-PnPOnline -Url $URLSP -UseWebLogin -ForceAuthentication
     Write-Log -Message "PnP connected." -Severity Information
 }
 catch {
