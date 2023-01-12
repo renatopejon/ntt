@@ -20,15 +20,16 @@ If(-not(Get-InstalledModule PnP.PowerShell -ErrorAction silentlycontinue)){
  
 Try {
      #Check if the Destination Folder exists. If not, create the folder for targetfile
-     If(!(Test-Path -Path $DestinationFolder))
-     {
+    If(!(Test-Path -Path $DestinationFolder))
+    {
         New-Item -ItemType Directory -Path $DestinationFolder | Out-Null
         Write-host -f Yellow "Created a New Folder '$DestinationFolder'"
-     }
-     
-    Write-Output "Downloading Genesys..."
+    }
+    
     #Connect to PnP Online
     Connect-PnPOnline -Url $SiteURL -UseWebLogin
+
+    Write-Output "Downloading Genesys..."
      
     #Check if File exists
     $File = Get-PnPFile -Url $FileServerRelativeURL -ErrorAction SilentlyContinue
