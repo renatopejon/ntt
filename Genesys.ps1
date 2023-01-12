@@ -25,7 +25,8 @@ Try {
         New-Item -ItemType Directory -Path $DestinationFolder | Out-Null
         Write-host -f Yellow "Created a New Folder '$DestinationFolder'"
      }
- 
+     
+    Write-Output "Downloading Genesys..."
     #Connect to PnP Online
     Connect-PnPOnline -Url $SiteURL -UseWebLogin
      
