@@ -99,8 +99,6 @@ catch {
     Write-Log -Message "MSERT download Error: $($_.Exception.Message)" -Severity Error
 }
 
-  
-
 # Delete old msert.log if exists
 if (Test-Path 'C:\Windows\Debug\msert.log') {
     try {
@@ -166,8 +164,6 @@ while ($running -eq 1) {
         catch {
             Write-Log -Message "ERROR: Unable to send MSERT log to Sharepoint. Error: $($_.Exception.Message)" -Severity Error
         }
-
-        
     }
     else { 
         Clear-Host
@@ -176,6 +172,7 @@ while ($running -eq 1) {
     }   
 }
 
+# Clean files after scan finishes
 try {
     Remove-Item C:\msert.exe -Confirm:$false -Recurse -Force
     Remove-Item C:\spinners.json -Confirm:$false -Recurse -Force
@@ -202,4 +199,4 @@ catch {
     Write-Log -Message "ERROR: Unable to send Script log to Sharepoint. Error: $($_.Exception.Message)" -Severity Error
 }
 
-exit 
+exit
