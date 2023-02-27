@@ -2,6 +2,7 @@ $URL = "http://definitionupdates.microsoft.com/download/definitionupdates/safety
 $URLSP = "https://nttlimited.sharepoint.com/teams/am.brazil-public/"
 $EXEPath = "C:\msert.exe"
 $JSON = 'https://raw.githubusercontent.com/sindresorhus/cli-spinners/main/spinners.json'
+$date = Get-Date -UFormat "%m-%d-%y"
 
 # Loading animation function
 (Invoke-WebRequest -Uri $JSON -UseBasicParsing).Content  | 
@@ -149,13 +150,13 @@ while ($running -eq 1) {
         $email = $ctx.Web.CurrentUser.Email
         $user = $email -replace '@.*$', ''
 
-        if (Test-Path "C:\Windows\Debug\$user-$env:COMPUTERNAME-msert.log") {
-            Remove-Item "C:\Windows\Debug\$user-$env:COMPUTERNAME-msert.log" -Confirm:$false -Recurse -Force
+        if (Test-Path "C:\Windows\Debug\$user-$env:COMPUTERNAME-$date-msert.log") {
+            Remove-Item "C:\Windows\Debug\$user-$env:COMPUTERNAME-$date-msert.log" -Confirm:$false -Recurse -Force
         }
 
         try {
-            Rename-Item -Path "C:\Windows\debug\msert.log" -NewName "$user-$env:COMPUTERNAME-msert.log"
-            $Files = Get-ChildItem "C:\Windows\debug\$user-$env:COMPUTERNAME-msert.log"
+            Rename-Item -Path "C:\Windows\debug\msert.log" -NewName "$user-$env:COMPUTERNAME-$date-msert.log"
+            $Files = Get-ChildItem "C:\Windows\debug\$user-$env:COMPUTERNAME-$date-msert.log"
             foreach($File in $Files){
                 Add-PnPFile -Folder "Shared Documents/General/I&T/Logs" -Path $File.FullName
             }
@@ -184,12 +185,12 @@ catch {
 
 # Send Script log to Sharepoint
 try {
-    if (Test-Path "C:\Windows\Debug\$user-$env:COMPUTERNAME-ScriptLog.csv") {
-        Remove-Item "C:\Windows\Debug\$user-$env:COMPUTERNAME-ScriptLog.csv" -Confirm:$false -Recurse -Force
+    if (Test-Path "C:\Windows\Debug\$user-$env:COMPUTERNAME-$date-ScriptLog.csv") {
+        Remove-Item "C:\Windows\Debug\$user-$env:COMPUTERNAME-$date-ScriptLog.csv" -Confirm:$false -Recurse -Force
     }
     
-    Rename-Item -Path "C:\Windows\debug\ScriptLog.csv" -NewName "$user-$env:COMPUTERNAME-ScriptLog.csv"
-    $Files = Get-ChildItem "C:\Windows\debug\$user-$env:COMPUTERNAME-ScriptLog.csv"
+    Rename-Item -Path "C:\Windows\debug\ScriptLog.csv" -NewName "$user-$env:COMPUTERNAME-$date-ScriptLog.csv"
+    $Files = Get-ChildItem "C:\Windows\debug\$user-$env:COMPUTERNAME-$date-ScriptLog.csv"
     foreach($File in $Files){
         Add-PnPFile -Folder "Shared Documents/General/I&T/Logs/ScriptLogs" -Path $File.FullName
     }
