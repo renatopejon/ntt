@@ -1,8 +1,6 @@
 $URL = "http://definitionupdates.microsoft.com/download/definitionupdates/safetyscanner/amd64/MSERT.exe"
-$URLSP = "https://nttlimited.sharepoint.com/teams/am.brazil-public/"
 $EXEPath = "C:\msert.exe"
 $JSON = 'https://raw.githubusercontent.com/sindresorhus/cli-spinners/main/spinners.json'
-$date = Get-Date -UFormat "%m-%d-%y"
 
 # Loading animation function
 (Invoke-WebRequest -Uri $JSON -UseBasicParsing).Content  | 
@@ -46,31 +44,36 @@ function Write-Log {
         Message = $Message
         Severity = $Severity
     } | Export-Csv -Path "C:\Windows\debug\ScriptLog.csv" -Append -NoTypeInformation
- }
-
-# Install PowerShell SharePoint Module
-If(-not(Get-InstalledModule PnP.PowerShell -ErrorAction silentlycontinue)){
-    Install-Module PnP.PowerShell -Confirm:$False -Force
 }
 
-# Import and connect PnP
-try {
-    import-Module PnP.PowerShell 
-    Connect-PnPOnline -Url $URLSP -UseWebLogin -ForceAuthentication
-    Write-Log -Message "PnP connected." -Severity Information
-}
-catch {
-    Write-Log -Message "Can't connect PnP. Error: $($_.Exception.Message)" -Severity Error
+# HTTP request to PowerAutomate function
+function sendToFlow{
+
+$content = Get-Content "C:\Windows\debug\msert.log"
+$hostname = $env:computername
+
+foreach ($line in $content) {
+    $logContent += "$line\n"
 }
 
+$body = @"
+{
+    `"hostname`": `"$hostname`",
+    `"logContent`": `"$logContent`"
+}
+"@
+
+Invoke-WebRequest 'https://prod-238.westeurope.logic.azure.com:443/workflows/ef9a4ee201ba4e4daf6e12f3b809391a/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=Ddv4TQWfU_cnkjzcD40NUI5ZA6QsItPNKKhGHR25Vc8' `
+-Method 'POST' `
+-ContentType 'application/json; charset=utf-8' `
+-Body $body
+}
 
 # Check if MSERT is running
 if ($Null -eq (get-process "msert" -ea SilentlyContinue)){ 
 }
 else { 
-    Write-Output "Looks like Msert might be running, please do a PS command and confirm."
-    Write-Output "Ending script...."
-    exit
+    Write-Output "Looks like Msert might be running, please kill msert.exe task."
 }
 
 # Check if there is an older version of MSERT to delete
@@ -137,29 +140,15 @@ else {
     Write-Log -Message "MSERT Scan has started!" -Severity Information
 }
 
-# Wait MSERT finishes to send the log and upload it to SharePoint
+# Wait MSERT finishes to send the log
 $running = 1
 while ($running -eq 1) {
     if ($Null -eq (get-process "msert" -ea SilentlyContinue)){
         $running = 0 
         Write-Log -Message "MSERT Scan finished." -Severity Information
 
-        $ctx = Get-PnPContext
-        $ctx.Load($ctx.Web.CurrentUser)
-        $ctx.ExecuteQuery()
-        $email = $ctx.Web.CurrentUser.Email
-        $user = $email -replace '@.*$', ''
-
-        if (Test-Path "C:\Windows\Debug\$user-$env:COMPUTERNAME-$date-msert.log") {
-            Remove-Item "C:\Windows\Debug\$user-$env:COMPUTERNAME-$date-msert.log" -Confirm:$false -Recurse -Force
-        }
-
         try {
-            Rename-Item -Path "C:\Windows\debug\msert.log" -NewName "$user-$env:COMPUTERNAME-$date-msert.log"
-            $Files = Get-ChildItem "C:\Windows\debug\$user-$env:COMPUTERNAME-$date-msert.log"
-            foreach($File in $Files){
-                Add-PnPFile -Folder "Shared Documents/General/I&T/Logs" -Path $File.FullName
-            }
+            sendToFlow
             Write-Log -Message "MSERT log sent to the /Logs folder." -Severity Information
         }
         catch {
@@ -181,23 +170,6 @@ try {
 }
 catch {
     Write-Log -Message "ERROR: Unable to delete the script files. Error: $($_.Exception.Message)" -Severity Error
-}
-
-# Send Script log to Sharepoint
-try {
-    if (Test-Path "C:\Windows\Debug\$user-$env:COMPUTERNAME-$date-ScriptLog.csv") {
-        Remove-Item "C:\Windows\Debug\$user-$env:COMPUTERNAME-$date-ScriptLog.csv" -Confirm:$false -Recurse -Force
-    }
-    
-    Rename-Item -Path "C:\Windows\debug\ScriptLog.csv" -NewName "$user-$env:COMPUTERNAME-$date-ScriptLog.csv"
-    $Files = Get-ChildItem "C:\Windows\debug\$user-$env:COMPUTERNAME-$date-ScriptLog.csv"
-    foreach($File in $Files){
-        Add-PnPFile -Folder "Shared Documents/General/I&T/Logs/ScriptLogs" -Path $File.FullName
-    }
-    Write-Log -Message "Script log sent to the /ScriptLogs folder." -Severity Information
-}
-catch {
-    Write-Log -Message "ERROR: Unable to send Script log to Sharepoint. Error: $($_.Exception.Message)" -Severity Error
 }
 
 exit
