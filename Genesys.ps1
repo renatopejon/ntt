@@ -15,7 +15,7 @@ function waitSetup {
 
 # Install PowerShell SharePoint Module
 If(-not(Get-InstalledModule PnP.PowerShell -ErrorAction silentlycontinue)){
-    Install-Module PnP.PowerShell -Confirm:$False -Force
+    Install-Module -Name PnP.PowerShell -RequiredVersion 1.12.0 -Confirm:$False -Force
 }
  
 Try {
