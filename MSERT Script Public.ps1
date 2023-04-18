@@ -1,5 +1,5 @@
 $URL = "http://definitionupdates.microsoft.com/download/definitionupdates/safetyscanner/amd64/MSERT.exe"
-$EXEPath = "C:\CSIRT\msert.exe"
+$EXEPath = "C:\msert.exe"
 $JSON = 'https://raw.githubusercontent.com/sindresorhus/cli-spinners/main/spinners.json'
 
 # Loading animation function
