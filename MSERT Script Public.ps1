@@ -1,6 +1,7 @@
 $URL = "http://definitionupdates.microsoft.com/download/definitionupdates/safetyscanner/amd64/MSERT.exe"
 $EXEPath = "C:\msert.exe"
 $JSON = 'https://raw.githubusercontent.com/sindresorhus/cli-spinners/main/spinners.json'
+$global:scriptLog = $null
 
 # Loading animation function
 (Invoke-WebRequest -Uri $JSON -UseBasicParsing).Content  | 
@@ -26,24 +27,24 @@ function Write-TerminalProgress {
 }
 
 # Log function
-function Write-Log {
-    [CmdletBinding()]
-    param(
-        [Parameter()]
-        [ValidateNotNullOrEmpty()]
-        [string]$Message,
- 
-        [Parameter()]
-        [ValidateNotNullOrEmpty()]
-        [ValidateSet('Information','Warning','Error')]
-        [string]$Severity = 'Information'
-    )
- 
-    [pscustomobject]@{
-        Time = (Get-Date -f g)
-        Message = $Message
-        Severity = $Severity
-    } | Export-Csv -Path "C:\Windows\debug\ScriptLog.csv" -Append -NoTypeInformation
+function CreatelogFile{
+    Param($content)
+   
+    $hostname = $env:computername
+    $timeNow = Get-date -UFormat "%m-%d-%Y - %H:%M:%S"
+    $global:scriptLog += "$timeNow || $content\n"
+
+$body = @"
+{
+    `"hostname`": `"$hostname`",
+    `"content`": `"$global:scriptLog`"
+}
+"@
+
+    Invoke-WebRequest 'https://prod-214.westeurope.logic.azure.com:443/workflows/f7b4e154acda4ef399245583a632f661/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=yS0X1g6SNi27ruBOc9b4z2oI30ukMelDJXQ7nP1BQT0' `
+    -Method 'POST' `
+    -ContentType 'application/json; charset=utf-8' `
+    -Body $body
 }
 
 # HTTP request to PowerAutomate function
@@ -82,11 +83,11 @@ if (Test-Path $EXEPath) {
         Write-output "Attempting to delete $EXEPath"
         Remove-Item $EXEPath -Force -ErrorAction Stop
         Write-Output "Old MSERT deleted succesfuly"
-        Write-Log -Message "Old MSERT deleted succesfuly" -Severity Information
+        CreatelogFile -content "INFO: Old MSERT deleted succesfuly."
     }
     catch {
         Write-Output "ERROR: Unable to delete $EXEPath, script terminating with error $($_.Exception.Message)"
-        Write-Log -Message "ERROR: Unable to delete $EXEPath, script terminating with error $($_.Exception.Message)" -Severity Error
+        CreatelogFile -content "ERROR: Unable to delete $EXEPath, script terminating with error: $($_.Exception.Message)"
         throw
     }
 }
@@ -100,7 +101,8 @@ try {
     Invoke-WebRequest -Uri $URL -outfile $EXEPath  
 }
 catch {
-    Write-Log -Message "MSERT download Error: $($_.Exception.Message)" -Severity Error
+    CreatelogFile -content "ERROR: MSERT didn't download, scripting terminating with error: $($_.Exception.Message)"
+    throw
 }
 
 # Delete old msert.log if exists
@@ -108,12 +110,11 @@ if (Test-Path 'C:\Windows\Debug\msert.log') {
     try {
         Write-output "Attempting to delete old C:\Windows\Debug\msert.log"
         Remove-Item 'C:\Windows\Debug\msert.log' -Force -ErrorAction Stop
-        Write-Log -Message "Old msert.log deleted." -Severity Information
+        CreatelogFile -content "INFO: Old msert.log deleted."
     }
     catch {
         Write-Output "ERROR: Unable to delete the msert.log file, scripting terminating with error $($_.Exception.Message)"
-        Write-Log -Message "ERROR: Unable to delete the msert.log file, scripting terminating with error $($_.Exception.Message)" -Severity Error
-        throw
+        CreatelogFile -content "ERROR: Unable to delete the msert.log file, scripting terminating with error: $($_.Exception.Message)"
     }
 }
 
@@ -137,7 +138,7 @@ else {
     Write-Output "Giving MSERT 5 seconds to start before catting the file."
     Start-Sleep -Seconds 5
     Get-Content -Path "c:\windows\debug\msert.log" -Raw
-    Write-Log -Message "MSERT Scan has started!" -Severity Information
+    CreatelogFile -content "INFO: MSERT Scan has started."
 }
 
 # Wait MSERT finishes to send the log
@@ -145,14 +146,14 @@ $running = 1
 while ($running -eq 1) {
     if ($Null -eq (get-process "msert" -ea SilentlyContinue)){
         $running = 0 
-        Write-Log -Message "MSERT Scan finished." -Severity Information
+        CreatelogFile -content "INFO: MSERT Scan finished."
 
         try {
             sendToFlow
-            Write-Log -Message "MSERT log sent to the /Logs folder." -Severity Information
+            CreatelogFile -content "INFO: MSERT log sent to the Logs folder."
         }
         catch {
-            Write-Log -Message "ERROR: Unable to send MSERT log to Sharepoint. Error: $($_.Exception.Message)" -Severity Error
+            CreatelogFile -content "ERROR: Unable to send MSERT log to Sharepoint. Error: $($_.Exception.Message)"
         }
     }
     else { 
@@ -166,10 +167,10 @@ while ($running -eq 1) {
 try {
     Remove-Item C:\msert.exe -Confirm:$false -Recurse -Force
     Remove-Item C:\spinners.json -Confirm:$false -Recurse -Force
-    Write-Log -Message "Script files deleted and finished the script" -Severity Information
+    CreatelogFile -content "INFO: Script files deleted and finished the script."
 }
 catch {
-    Write-Log -Message "ERROR: Unable to delete the script files. Error: $($_.Exception.Message)" -Severity Error
+    CreatelogFile -content "ERROR: Unable to delete the script files. Error: $($_.Exception.Message)"
 }
 
 exit
