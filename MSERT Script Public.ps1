@@ -204,6 +204,7 @@ Function Clear-WaterfoxCacheFiles {
 
 Write-Host "Clearing Windows temp files and DNS cache"
 try {
+    ipconfig /flushdns
     Clear-GlobalWindowsCache
     CreatelogFile -content "INFO: Windows temp files and DNS cache cleared."
 }
