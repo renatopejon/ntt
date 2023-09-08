@@ -19,6 +19,12 @@ function Open-File([string] $initialDirectory){
 } 
 
 $open_file = Open-File $env:USERPROFILE
+if ($open_file -eq "") 
+{
+    Write-Host "You didn't select a file" 
+    throw
+} 
+
 $list = Import-Csv $open_file
 
 foreach ($user in $list.mail) {
