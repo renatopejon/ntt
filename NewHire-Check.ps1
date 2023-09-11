@@ -3,8 +3,12 @@ If(-not(Get-InstalledModule AzureAD -ErrorAction silentlycontinue)){
     Install-Module -Name AzureAD -Confirm:$False -Force
 }
 
+Write-Host "Please, log in to your AzureAD account"
 Import-Module AzureAD
 Connect-AzureAD
+
+Write-Host "Please, log in to the on-prem AD"
+$cred = Get-Credential
 
 function Open-File([string] $initialDirectory){
 
@@ -89,7 +93,7 @@ foreach ($user in $list.mail) {
     Write-Host -ForegroundColor Cyan "Checking on-prem AD attributes"
 
     $user = $user.Replace("@global.ntt", "")
-    $aduser = Get-ADUser -Server "na.didata.local" -Identity $user -Properties * | Select-Object identitylifecyclestate, lockoutime, msExchHideFromAddressLists
+    $aduser = Get-ADUser -Server "na.didata.local" -Credential $cred -Identity $user -Properties * | Select-Object identitylifecyclestate, lockoutime, msExchHideFromAddressLists
 
     Write-Host -NoNewline "identitylifecyclestate "
     if ($aduser.identitylifecyclestate -eq 'active') {
