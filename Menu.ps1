@@ -18,7 +18,7 @@ Write-Host "
                                                                                          
 "
 Write-Output "`------------------------------------------"
-Write-Output "|      LATAM I&T Utilities Script         |"
+Write-Output "|    LATAM I&T Utilities Script v3.1      |"
 Write-Output "------------------------------------------`n"
 Write-Output "1 - Install Genesys with ITSM integration"
 Write-Output "2 - MSERT Scan"
