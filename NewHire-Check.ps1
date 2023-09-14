@@ -38,6 +38,13 @@ $list = @()
 if ($prompt -eq ''){
     Write-Host "Choose the CSV file to check the users"
     Write-Host ""
+    Write-Host "The file's structure must be like this:"
+    Write-Host ""
+    Write-Host "mail"
+    Write-Host "user.one@global.ntt"
+    Write-Host "user.two@global.ntt"
+    Write-Host "user.three@global.ntt"
+    Write-Host "user.four@global.ntt"
 
     $open_file = Open-File $env:USERPROFILE
     if ($open_file -eq "") 
