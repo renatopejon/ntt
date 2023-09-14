@@ -40,7 +40,7 @@ switch ($num) {
   
   3 {
     Clear-Host
-    Write-Output "Starting NewHire Check script..."
+    Write-Output "Starting Account integrity check script..."
     Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/renatopejon/ntt/main/NewHire-Check.ps1'))
 } 
 }

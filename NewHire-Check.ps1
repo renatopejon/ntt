@@ -2,6 +2,7 @@
 If(-not(Get-InstalledModule AzureAD -ErrorAction silentlycontinue)){
     Install-Module -Name AzureAD -Confirm:$False -Force
 }
+Import-Module AzureAD
 
 function Open-File([string] $initialDirectory){
 
@@ -16,10 +17,11 @@ function Open-File([string] $initialDirectory){
 } 
 
 Write-Host "Please, log in to your AzureAD account"
+Clear-Host
 
-Import-Module AzureAD
-#$connection = Connect-AzureAD
-If(!$connection){$connection = Connect-AzureAD}
+If(!$connection){
+    $connection = Connect-AzureAD
+}
 
 $test = Test-Connection -Server 10.214.10.20
 
@@ -29,11 +31,13 @@ if ($null -eq $test) {
 }
 
 $prompt = Read-Host "Type the user's email for check or just leave it blank to upload a CSV file"
+Write-Host ""
 
 $list = @()
 
 if ($prompt -eq ''){
     Write-Host "Choose the CSV file to check the users"
+    Write-Host ""
 
     $open_file = Open-File $env:USERPROFILE
     if ($open_file -eq "") 
@@ -55,9 +59,9 @@ foreach ($user in $list.mail) {
 
     $groups = Get-AzureADUserMembership -ObjectId $user | Select-Object Objectid
 
-    Write-Host -ForegroundColor Yellow "User: $user"
+    Write-Host -ForegroundColor Yellow "Checking user: $user"
     Write-Host ""
-    Write-Host -ForegroundColor Cyan "Checking AzureAD groups:"
+    Write-Host -ForegroundColor Cyan "AzureAD groups:"
 
     ## Azure AD checks
 
@@ -121,7 +125,7 @@ foreach ($user in $list.mail) {
 
 
     ## On-prem AD checks
-    Write-Host -ForegroundColor Cyan "Checking on-prem AD attributes"
+    Write-Host -ForegroundColor Cyan "On-prem AD attributes"
 
     $user = $user.Replace("@global.ntt", "")
     $aduser = Get-ADUser -Server 10.214.10.20 -Identity $user -Properties * | Select-Object identitylifecyclestate, lockoutime, msExchHideFromAddressLists, msNPAllowDialin, lockoutTime
