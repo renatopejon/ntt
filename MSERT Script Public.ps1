@@ -114,11 +114,11 @@ Function Remove-CacheFiles {
                     {
                         [int]$pathSubString = $path.ToCharArray().Count - 1
                         $sanitizedPath = $path.SubString(0, $pathSubString)
-                        Remove-Item -Path "$sanitizedPath\*" -Recurse -Force -ErrorAction SilentlyContinue -Verbose
+                        Remove-Item -Path "$sanitizedPath\*" -Recurse -Force -ErrorAction SilentlyContinue
                     }
                     else 
                     {
-                        Remove-Item -Path "$path\*" -Recurse -Force -ErrorAction SilentlyContinue -Verbose              
+                        Remove-Item -Path "$path\*" -Recurse -Force -ErrorAction SilentlyContinue              
                     } 
                 } catch { }
             }
@@ -126,7 +126,7 @@ Function Remove-CacheFiles {
             {
                 try 
                 {
-                    Remove-Item -Path $path -Force -ErrorAction SilentlyContinue -Verbose
+                    Remove-Item -Path $path -Force -ErrorAction SilentlyContinue
                 } catch { }
             }
         }    
