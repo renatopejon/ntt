@@ -87,7 +87,7 @@ Function Clear-UserCacheFiles {
     ForEach($localUser in (Get-ChildItem 'C:\users').Name)
     {
         Clear-ChromeCache $localUser
-        Clear-EdgeCacheFiles $localUser
+        Clear-EdgeCache $localUser
         Clear-FirefoxCacheFiles $localUser
     }
 }
