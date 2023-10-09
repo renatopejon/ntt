@@ -36,13 +36,14 @@ Set-Location "C:\Windows\Temp\GenesysWithITSM"
 Write-Host "Installing Workspace... " -NoNewline
 try {
     .\IP_IntWorkspace_8514705b1_ENU_windows\ip\setup.exe
+    waitSetup
     Write-Host "OK" -ForegroundColor Green
 }
 catch {
     Write-Host "Error: $($_.Exception.Message)"
 }
 
-waitSetup
+
 
 Write-Host "Copying Files... " -NoNewline
 try {
@@ -56,13 +57,12 @@ catch {
 Write-Host "Installing SipEndpoint... " -NoNewline
 try {
     .\IP_IntWSpaceSIPEp_8511540b1_ENU_windows\ip\setup.exe
+    waitSetup
     Write-Host "OK" -ForegroundColor Green
 }
 catch {
     Write-Host "Error: $($_.Exception.Message)"
 }
-
-waitSetup
 
 Write-Host "Backing up SipEndpoint.config... " -NoNewline
 try {
