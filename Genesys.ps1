@@ -7,7 +7,6 @@ function waitSetup {
     while ($running -eq 1) {
         if ($Null -eq (get-process "setup" -ea SilentlyContinue)){
             $running = 0 
-            Write-Host "OK" -ForegroundColor Green
         } 
     }    
 }
