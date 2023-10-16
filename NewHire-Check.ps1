@@ -16,8 +16,9 @@ function Open-File([string] $initialDirectory){
     return $OpenFileDialog.filename
 } 
 
-Write-Host "Please, log in to your AzureAD account"
 Clear-Host
+Write-Host "Please, log in to your AzureAD account"
+
 
 If(!$connection){
     $connection = Connect-AzureAD
