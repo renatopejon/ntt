@@ -1,4 +1,4 @@
-$URL = "http://definitionupdates.microsoft.com/download/definitionupdates/safetyscanner/amd64/MSERT.exe"
+$URL = "https://www.microsoft.com/security/encyclopedia/adlpackages.aspx?package=scanner&arch=x64"
 $EXEPath = "C:\msert.exe"
 $JSON = 'https://raw.githubusercontent.com/sindresorhus/cli-spinners/main/spinners.json'
 $global:scriptLog = $null
