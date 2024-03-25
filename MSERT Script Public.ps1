@@ -3,6 +3,13 @@ $EXEPath = "C:\msert.exe"
 $JSON = 'https://raw.githubusercontent.com/sindresorhus/cli-spinners/main/spinners.json'
 $global:scriptLog = $null
 
+# Check if Banco do Brasil app exists
+$BBfolder = Test-Path "C:\Program Files\Topaz OFD"
+if ($BBFolder) {
+    Write-Warning "Banco do Brasil security module detected! Please run the MSERT scan manually"
+    Read-Host -Prompt "Exiting MSERT Script. Press any key to close the window"
+    exit
+}
 # Loading animation function
 (Invoke-WebRequest -Uri $JSON -UseBasicParsing).Content  | 
     Set-Content -Path c:\spinners.json -Encoding UTF8
