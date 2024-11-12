@@ -126,7 +126,7 @@ catch {
     Write-Error $_.Exception.Message
 }
 
-Write-Host "Reseting all browsers cookies and cache"
+Write-Host "`nReseting all browsers cookies and cache"
 try {
     Clear-UserCacheFiles
     Write-Host "Browser cookies and cache cleared" -ForegroundColor Black -BackgroundColor Green
