@@ -118,19 +118,20 @@ Write-Host "Clearing Windows temp files and DNS cache"
 try {
     ipconfig /flushdns
     Clear-GlobalWindowsCache
-    Write-Host " OK" -NoNewline -ForegroundColor Green
+    Write-Host "DNS cache cleared" -ForegroundColor Black -BackgroundColor Green
+    Write-Host "Windows temp files deleted" -ForegroundColor Black -BackgroundColor Green
 }
 catch {
-    Write-Host " ERROR" -NoNewline -ForegroundColor Red
+    Write-Host "ERROR when clear DNS or temp files" -NoNewline -ForegroundColor Red
     Write-Error $_.Exception.Message
 }
 
 Write-Host "Reseting all browsers cookies and cache"
 try {
     Clear-UserCacheFiles
-    Write-Host " OK" -NoNewline -ForegroundColor Green
+    Write-Host "Browser cookies and cache cleared" -ForegroundColor Black -BackgroundColor Green
 }
 catch {
-    Write-Host " ERROR" -NoNewline -ForegroundColor Red
+    Write-Host "ERROR when clear browser data" -NoNewline -ForegroundColor Red
     Write-Error $_.Exception.Message
 }
