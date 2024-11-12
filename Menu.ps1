@@ -40,7 +40,7 @@ switch ($num) {
   
   3 {
     Clear-Host
-    Write-Output "Starting Account integrity check script..."
+    Write-Output "Starting Clear Files script..."
     Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/renatopejon/ntt/main/Clear-Files.ps1'))
 } 
 }
