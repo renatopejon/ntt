@@ -118,8 +118,10 @@ Write-Host "Clearing Windows temp files and DNS cache"
 try {
     ipconfig /flushdns
     Clear-GlobalWindowsCache
+    Write-Host " OK" -NoNewline -ForegroundColor Green
 }
 catch {
+    Write-Host " ERROR" -NoNewline -ForegroundColor Red
     Write-Error $_.Exception.Message
 }
 
@@ -129,6 +131,6 @@ try {
     Write-Host " OK" -NoNewline -ForegroundColor Green
 }
 catch {
-    Write-Error $_.Exception.Message
     Write-Host " ERROR" -NoNewline -ForegroundColor Red
+    Write-Error $_.Exception.Message
 }
