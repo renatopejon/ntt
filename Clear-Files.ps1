@@ -118,17 +118,15 @@ Write-Host "Clearing Windows temp files and DNS cache"
 try {
     ipconfig /flushdns
     Clear-GlobalWindowsCache
-    CreatelogFile -content "INFO: Windows temp files and DNS cache cleared."
 }
 catch {
-    CreatelogFile -content "ERROR: Unable to clear Windows temp files and DNS cache: $($_.Exception.Message)"
+    Write-Error $_.Exception.Message
 }
 
 Write-Host "Reseting all browsers cookies and cache"
 try {
     Clear-UserCacheFiles
-    CreatelogFile -content "INFO: Browsers cookies and cache cleared."
 }
 catch {
-    CreatelogFile -content "ERROR: Unable to clear browsers cookies and cache: $($_.Exception.Message)"
+    Write-Error $_.Exception.Message
 }
