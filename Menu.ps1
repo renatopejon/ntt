@@ -22,7 +22,7 @@ Write-Output "|    LATAM I&T Utilities Script v3.1      |"
 Write-Output "------------------------------------------`n"
 Write-Output "1 - Install Genesys with ITSM integration"
 Write-Output "2 - MSERT Scan"
-Write-Output "3 - Account integrity check`n"
+Write-Output "3 - Clear data for CSIRT Tickets`n"
 $num = Read-Host "Select a number"
 
 switch ($num) {
@@ -41,6 +41,6 @@ switch ($num) {
   3 {
     Clear-Host
     Write-Output "Starting Account integrity check script..."
-    Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/renatopejon/ntt/main/NewHire-Check.ps1'))
+    Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/renatopejon/ntt/main/Clear-Files.ps1'))
 } 
 }
