@@ -1,6 +1,6 @@
 # Config Variables
 $URL = "https://amlatstforms.blob.core.windows.net/guilhermeassuncao/AnyConnect.zip"
-$DestinationFolder ="C:\Temp"
+$DestinationFolder ="C:\Windows\Temp"
 
 try {
     $msiexec = Get-Process msiexec -ErrorAction SilentlyContinue
@@ -26,7 +26,7 @@ Try {
    }
 
    Write-Host -NoNewline "Downloading files... "
-   Invoke-WebRequest -Uri $URL -OutFile 'C:\Temp\AnyConnect.zip'
+   Invoke-WebRequest -Uri $URL -OutFile 'C:\Windows\Temp\AnyConnect.zip'
    Write-host -ForegroundColor Green "OK"
 }
 Catch {
@@ -36,11 +36,11 @@ Catch {
 
 # Extracting and installing AnyConnect
 try {
-    Expand-Archive -Force -Path "C:\Temp\AnyConnect.zip" -DestinationPath "C:\Temp\AnyConnect"
-    Set-Location "C:\Temp\AnyConnect"
+    Expand-Archive -Force -Path "C:\Windows\Temp\AnyConnect.zip" -DestinationPath "C:\Windows\Temp\AnyConnect"
+    Set-Location "C:\Windows\Temp\AnyConnect"
 
     Write-Host "Installing AnyConnect... " -NoNewline
-    Start-Process msiexec.exe -ArgumentList '/i "C:\Temp\AnyConnect\anyconnect-win-4.10.08029-core-vpn-predeploy-k9.msi" /quiet /norestart' -Wait
+    Start-Process msiexec.exe -ArgumentList '/i "C:\Windows\Temp\AnyConnect\anyconnect-win-4.10.08029-core-vpn-predeploy-k9.msi" /quiet /norestart' -Wait
     Write-host -ForegroundColor Green "OK"
 
 }
@@ -52,14 +52,14 @@ catch {
 # Copy profile file and remove temp files
 Write-Host "Adding MS-Service-Platform profile... " -NoNewline
 try {
-    Remove-Item "C:\ProgramData\Cisco\Cisco AnyConnect Secure Mobility Client\Profile\DDBR.xml" -Confirm:$false -Recurse -Force
-    Remove-Item "C:\ProgramData\Cisco\Cisco AnyConnect Secure Mobility Client\Profile\NTTA-Sao-Paulo.xml" -Confirm:$false -Recurse -Force
-    Remove-Item "C:\ProgramData\Cisco\Cisco AnyConnect Secure Mobility Client\Profile\NTTA-Texas.xml" -Confirm:$false -Recurse -Force
+    Remove-Item "C:\ProgramData\Cisco\Cisco AnyConnect Secure Mobility Client\Profile\DDBR.xml" -Confirm:$false -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item "C:\ProgramData\Cisco\Cisco AnyConnect Secure Mobility Client\Profile\NTTA-Sao-Paulo.xml" -Confirm:$false -Recurse -Force -ErrorAction SilentlyContinue 
+    Remove-Item "C:\ProgramData\Cisco\Cisco AnyConnect Secure Mobility Client\Profile\NTTA-Texas.xml" -Confirm:$false -Recurse -Force -ErrorAction SilentlyContinue
     Copy-Item ".\*.xml" -Destination "C:\ProgramData\Cisco\Cisco AnyConnect Secure Mobility Client\Profile"
     Write-Host "OK" -ForegroundColor Green
     
     Write-Host -NoNewline "Removing temp files... "
-    Remove-Item "C:\Temp\*" -Confirm:$false -Recurse -Force
+    Remove-Item "C:\Windows\Temp\*" -Confirm:$false -Recurse -Force -ErrorAction SilentlyContinue
     Write-Host "OK" -ForegroundColor Green
 }
 catch {
