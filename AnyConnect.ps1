@@ -1,6 +1,6 @@
 # Config Variables
 $URL = "https://amlatstforms.blob.core.windows.net/guilhermeassuncao/AnyConnect.zip"
-$DestinationFolder ="C:\Windows\Temp"
+$DestinationFolder ="C:\Temp"
 
 try {
     $msiexec = Get-Process msiexec -ErrorAction SilentlyContinue
@@ -26,7 +26,7 @@ Try {
    }
 
    Write-Host -NoNewline "Downloading files... "
-   Invoke-WebRequest -Uri $URL -OutFile 'C:\Windows\Temp\AnyConnect.zip'
+   Invoke-WebRequest -Uri $URL -OutFile 'C:\Temp\AnyConnect.zip'
    Write-host -ForegroundColor Green "OK"
 }
 Catch {
@@ -36,11 +36,11 @@ Catch {
 
 # Extracting and installing AnyConnect
 try {
-    Expand-Archive -Force -Path "C:\Windows\Temp\AnyConnect.zip" -DestinationPath "C:\Windows\Temp\AnyConnect"
-    Set-Location "C:\Windows\Temp\AnyConnect"
+    Expand-Archive -Force -Path "C:\Temp\AnyConnect.zip" -DestinationPath "C:\Temp\AnyConnect"
+    Set-Location "C:\Temp\AnyConnect"
 
     Write-Host "Installing AnyConnect... " -NoNewline
-    Start-Process msiexec.exe -ArgumentList '/i "C:\Windows\Temp\AnyConnect\anyconnect-win-4.10.08029-core-vpn-predeploy-k9.msi" /quiet /norestart' -Wait
+    Start-Process msiexec.exe -ArgumentList '/i "C:\Temp\AnyConnect\anyconnect-win-4.10.08029-core-vpn-predeploy-k9.msi" /quiet /norestart' -Wait
     Write-host -ForegroundColor Green "OK"
 
 }
@@ -59,7 +59,7 @@ try {
     Write-Host "OK" -ForegroundColor Green
     
     Write-Host -NoNewline "Removing temp files... "
-    Remove-Item "C:\Windows\Temp\*" -Confirm:$false -Recurse -Force
+    Remove-Item "C:\Temp\*" -Confirm:$false -Recurse -Force
     Write-Host "OK" -ForegroundColor Green
 }
 catch {
