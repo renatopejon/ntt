@@ -20,7 +20,7 @@ Write-Host "
 Write-Output "`------------------------------------------"
 Write-Output "|    LATAM I&T Utilities Script v5.0      |"
 Write-Output "------------------------------------------`n"
-Write-Output "1 - Clear data for CSIRT Tickets`n"
+Write-Output "1 - Clear data for CSIRT Tickets"
 Write-Output "2 - AnyConnect update for MS-Service-Platforms`n"
 $num = Read-Host "Select a number"
 
